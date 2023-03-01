@@ -8,9 +8,9 @@ from firebase_admin import firestore
 from firebase_admin import initialize_app
 import firebase_admin
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
-from scipy.sparse import csr_matrix
+# from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 app = Flask(__name__)
 
@@ -78,13 +78,13 @@ def getSimilarity():
 
         df_cd = pd.merge(df, df2, how='inner', on='petId')
         print(df2)
-        tdf = TfidfVectorizer(min_df=2, max_df=0.7)
+        # tdf = TfidfVectorizer(min_df=2, max_df=0.7)
 
-        import nltk
-        from nltk.corpus import stopwords
-        print(stopwords.fileids())
-        stop_words = set(stopwords.words('arabic'))
-        print(stop_words)
+        # import nltk
+        # from nltk.corpus import stopwords
+        # print(stopwords.fileids())
+        # stop_words = set(stopwords.words('arabic'))
+        # print(stop_words)
 
         # vectorizer = TfidfVectorizer(
         #     lowercase=False, use_idf=True, stop_words=stop_words)
