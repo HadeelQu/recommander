@@ -278,4 +278,4 @@ def getSimilarity():
     return {"similarity_pets": recommandation, "similarity_users": Collaborative_filtering}
 
 
-app.run(port=5002, debug=True)
+app.run(port=5003, debug=True)
