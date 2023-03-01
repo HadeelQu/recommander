@@ -15,7 +15,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 app = Flask(__name__)
 
 
-@app.route('/', methods=['POST'])
+@app.route('/api', methods=['POST'])
 def getSimilarity():
 
     global response
