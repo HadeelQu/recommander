@@ -1,4 +1,3 @@
-from urllib.request import urlopen
 from firebase_admin import credentials
 
 import firebase_admin
@@ -13,7 +12,6 @@ import pandas as pd
 import numpy as np
 # from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
-
 app = Flask(__name__)
 
 
@@ -24,9 +22,8 @@ def getSimilarity():
     if (request.method == "POST"):
         if not firebase_admin._apps:
             url = "https://github.com/HadeelQu/recommander/blob/main/Ewaa.json"
-            response = urlopen(url)
             cred = credentials.Certificate(
-                json.loads(response.read()))
+                url)
             firebase_admin.initialize_app(cred)
 
         db = firestore.client()
