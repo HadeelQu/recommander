@@ -279,5 +279,5 @@ def getSimilarity():
 
 
 # app.run(port=5003, debug=True)
-app.run(port=125, debug=True)
+app.run(host='0.0.0.0', port=125, debug=True)
 # app.run(host='0.0.0.0', port=1, debug=True)
