@@ -22,7 +22,7 @@ def getSimilarity():
     if (request.method == "POST"):
         if not firebase_admin._apps:
             cred = credentials.Certificate(
-                "/Users/hadeelkhalid/Desktop/PythonProjects 3/Flutter_Flask_Basic/API/Ewaa.json")
+                "https://github.com/HadeelQu/recommander/blob/main/Ewaa.json")
             firebase_admin.initialize_app(cred)
 
         db = firestore.client()
