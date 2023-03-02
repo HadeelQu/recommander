@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 # from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
+import re, json, requests
 app = Flask(__name__)
 
 
@@ -22,6 +23,8 @@ def getSimilarity():
     if (request.method == "POST"):
         if not firebase_admin._apps:
             url = "https://raw.githubusercontent.com/HadeelQu/kewaa/main/Ewaa.json"
+            resp = requests.get(url)
+            data = json.loads(resp.text)
             cred = credentials.Certificate(
                 url)
             firebase_admin.initialize_app(cred)
