@@ -26,7 +26,7 @@ def getSimilarity():
             resp = requests.get(url)
             data = json.loads(resp.text)
             cred = credentials.Certificate(
-                url)
+                data)
             firebase_admin.initialize_app(cred)
 
         db = firestore.client()
