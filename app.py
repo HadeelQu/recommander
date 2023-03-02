@@ -21,7 +21,7 @@ def getSimilarity():
     global response
     if (request.method == "POST"):
         if not firebase_admin._apps:
-            url = "https://github.com/HadeelQu/recommander/blob/main/Ewaa.json"
+            url = "https://raw.githubusercontent.com/HadeelQu/kewaa/main/Ewaa.json"
             cred = credentials.Certificate(
                 url)
             firebase_admin.initialize_app(cred)
