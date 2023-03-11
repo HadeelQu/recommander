@@ -8,14 +8,15 @@ from firebase_admin import firestore
 from firebase_admin import initialize_app
 import firebase_admin
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
-from scipy.sparse import csr_matrix
+# from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
+import re, json, requests
 app = Flask(__name__)
 
 
-@app.route('/api', methods=['POST'])
+@app.route('/', methods=['POST'])
 def getSimilarity():
 
     global response
@@ -80,13 +81,13 @@ def getSimilarity():
 
         df_cd = pd.merge(df, df2, how='inner', on='petId')
         print(df2)
-        tdf = TfidfVectorizer(min_df=2, max_df=0.7)
+        # tdf = TfidfVectorizer(min_df=2, max_df=0.7)
 
-        import nltk
-        from nltk.corpus import stopwords
-        print(stopwords.fileids())
-        stop_words = set(stopwords.words('arabic'))
-        print(stop_words)
+        # import nltk
+        # from nltk.corpus import stopwords
+        # print(stopwords.fileids())
+        # stop_words = set(stopwords.words('arabic'))
+        # print(stop_words)
 
         # vectorizer = TfidfVectorizer(
         #     lowercase=False, use_idf=True, stop_words=stop_words)
@@ -147,7 +148,7 @@ def getSimilarity():
         # merged_df = pd.concat([pd.DataFrame(color)])
         # merged_df
         # merged_df.merge(pd.DataFrame(breed))
-        #
+
         # merged_df.merge(pd.DataFrame(age), left_index=True, right_index=True, )
 
         from functools import reduce
