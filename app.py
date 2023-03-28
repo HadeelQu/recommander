@@ -12,7 +12,9 @@ import pandas as pd
 import numpy as np
 # from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
-import re, json, requests
+import re
+import json
+import requests
 app = Flask(__name__)
 
 
@@ -26,11 +28,11 @@ def getSimilarity():
         if not firebase_admin._apps:
             # reed the key og firebase from  ewaa apllication
             cred = credentials.Certificate(
-               request_data['cer'])
+                request_data['cer'])
             firebase_admin.initialize_app(cred)
 
         db = firestore.client()
-        # Get all prt from firebase
+        # Get all pet from firebase
         pets = list(db.collection('pets').stream())
         most_like = []
         # Get the most ten like pet
@@ -52,27 +54,15 @@ def getSimilarity():
         # tranform the stram to dic and save it to datafram
         pets_dict = list(map(lambda x: x.to_dict(), pets))
         df = pd.DataFrame(pets_dict)
-        print(df)
-        print(df['gender'])
-        request_data = request.data
-        request_data = json.loads(request_data.decode('utf-8'))
-        #name = request_data['name']
-        #p = request_data['personality']
-        # print(p)
         # get the user id of the active user
         print(request_data['userID'])
         df.info()
+        # initialize dataframe to save each pet and who like this pet
         data2 = {"user": [], "petId": []}
         df2 = pd.DataFrame(data2)
         df2
-        df['likedUsers']
 
-        for index, row in df.iterrows():
-
-            print(row['likedUsers'])
-            for j in row['likedUsers']:
-                print(j)
-
+        # get like user for eavh pet and save it ti the previous datafram
         for index, row in df.iterrows():
             petid = row['petId']
             for j in row['likedUsers']:
@@ -84,30 +74,19 @@ def getSimilarity():
 
         df_cd = pd.merge(df, df2, how='inner', on='petId')
         print(df2)
-        # tdf = TfidfVectorizer(min_df=2, max_df=0.7)
-
-        # import nltk
-        # from nltk.corpus import stopwords
-        # print(stopwords.fileids())
-        # stop_words = set(stopwords.words('arabic'))
-        # print(stop_words)
-
-        # vectorizer = TfidfVectorizer(
-        #     lowercase=False, use_idf=True, stop_words=stop_words)
-        #
-        # df['personalites'] = df['personalites'].apply(str)
-        # vectors = vectorizer.fit_transform(df['personalites'])
-        # feature_names = vectorizer.get_feature_names()
-        # print(feature_names)
+       # get like list for this user
         df_cd = pd.merge(df, df2, how='inner', on='petId')
+        # get the like pet for active user
         likeList = df_cd.loc[df_cd['user'] == request_data['userID']]
         print(likeList.empty)
+        # if the likelist is empty then we return the most like pet for content based and for collabrative we retuen the least like pet
         if (likeList.empty):
             return {"similarity_pets": most_like, "similarity_users": least_like}
 
         import numpy as np
 
         copy = likeList.copy(deep=True)
+        # genrate crosee tab to encode the color for each pet
         color = pd.crosstab(df['petId'], df['color'])
 
         color
@@ -115,26 +94,24 @@ def getSimilarity():
         likecolor = color[color.index.isin(np.array(likeList.petId))]
         print(likecolor)
         print(likecolor.mean())
+
         breed = pd.crosstab(df['petId'], df['breed'])
-
         print(breed)
-
         likebreed = breed[breed.index.isin(np.array(likeList.petId))]
         print(likebreed)
         print(likebreed.mean())
+
         age = pd.crosstab(df['petId'], df['age'])
-
         pd.crosstab(df['petId'], df['age'])
-
         likeage = age[age.index.isin(np.array(likeList.petId))]
         print(likeage)
         print(likeage.mean())
-        Category = pd.crosstab(df['petId'], df['category'])
 
+        Category = pd.crosstab(df['petId'], df['category'])
         pd.crosstab(df['petId'], df['category'])
         likeCategory = Category[Category.index.isin(np.array(likeList.petId))]
         likeCategory
-        likeage.mean()
+        likeCategory.mean()
 
         Weight = []
         # Weight.append(1)
@@ -147,13 +124,6 @@ def getSimilarity():
         for i in likeCategory.mean().values:
             Weight.append(i)
 
-        # Weight
-        # merged_df = pd.concat([pd.DataFrame(color)])
-        # merged_df
-        # merged_df.merge(pd.DataFrame(breed))
-
-        # merged_df.merge(pd.DataFrame(age), left_index=True, right_index=True, )
-
         from functools import reduce
 
         # define list of DataFrames
@@ -165,6 +135,7 @@ def getSimilarity():
                                                        how='outer'), dfs)
         list_user_like = likeList['petId']
         final_df = final_df.drop(list_user_like, axis=0)
+
         r = final_df.multiply(Weight, axis=1)
         r
         r['Total'] = r.sum(axis=1)
@@ -179,6 +150,16 @@ def getSimilarity():
         petid_adopted = df5['petId']
         print(petid_adopted)
         final_reco = r.drop(np.array(petid_adopted))
+        # get id of my pey
+        myPet = db.collection('pets').where(
+            "ownerId", "==", request_data['userID']).get()
+        my_pet = []
+        for i in myPet:
+            print(i.to_dict())
+            j = i.to_dict()
+            my_pet.append(j['petId'])
+       # delete my pet
+        final_reco = final_reco[~final_reco.index.isin(my_pet)]
 
         recomm = final_reco.sort_values(by=['Total'], ascending=False).head(10)
         print(recomm['Total'])
@@ -191,7 +172,6 @@ def getSimilarity():
             print(f' content recommander is empty? {True}')
             recommandation = most_like
 
-        ##respone = f'hi {name}! this is python'
         print(recommandation)
 
         ###### Collabrative #####################
@@ -250,7 +230,7 @@ def getSimilarity():
             y = row * most_similar_user[index]
             #  print(y.values)
             a.append(y.values)
-        #  print(a)
+
         # weightd matrix
         c = pd.DataFrame(a, index=return_like_pet_for_all_most_sim_users.index,
                          columns=return_like_pet_for_all_most_sim_users.columns)
@@ -274,7 +254,8 @@ def getSimilarity():
         print(rec2)
         df6 = df[df['isAdopted'] == True]
         petid_adopted2 = df6['petId']
-        rec2=rec2[~rec2.index.isin( petid_adopted2)]
+        rec2 = rec2[~rec2.index.isin(petid_adopted2)]
+        rec2 = rec2[~rec2.index.isin(my_pet)]
 
         Collaborative_filtering = []
         for index, row in rec2.iterrows():
@@ -282,14 +263,11 @@ def getSimilarity():
             if (row['score'] > 0):
                 Collaborative_filtering.append(index)
 
-
-
         if (len(Collaborative_filtering) == 0):
             print(f' collbrative recommander is empty? {True}')
             Collaborative_filtering = least_like
 
     return {"similarity_pets": recommandation, "similarity_users": Collaborative_filtering}
-
 
 
 if __name__ == "__main__":
